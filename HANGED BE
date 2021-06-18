@@ -1,83 +1,114 @@
-# ================================= #
-# HANGME.py
+# ============================ #
+# hangmernpls.py
 # 6/17/2021
 # Mark Balagtas
-# I just made this today cuz I restarted like 15 billion times on this assignment cuz I don't know what to make. ( ͡° ͜ʖ ͡°)
+# I just made this today cuz I restarted like 15 billion times on this assignment cuz I didn't know what to make. ( ͡° ͜ʖ ͡°)
 # ================================= #
+import time as t
+import random as r
 
-# ============= imports ============== #
-import pygame
-import math
-import random
-from os import path 
+standard_words = ['secret','obama', 'duck', 'thewhyteway'] # standard words list if they choose not to make own words
+added_words = []
 
-img_dir = path.join(path.dirname(__file__), 'img') # img directory uwu
-
-WIDTH = 800 # screen
-HEIGHT = 600
-FPS = 60
-
-WHITE = (255,255,255) # COLOURS
-BLACK = (0,0,0)
-
-pygame.init() # inits pygame 
-screen = pygame.display.set_mode((WIDTH, HEIGHT)) # open game window using da width and height
-pygame.display.set_caption("HANG MEEEEEEEE!!!!!!")
-clock = pygame.time.Clock() # for fps
-
-font_name = pygame.font.SysFont('comicsans', 40)
-
-#button vars
-RADIUS = 20
-SPACE = 15
-letters = []
-startx = round((WIDTH - (RADIUS * 2 + SPACE) * 13) / 2) # x position of letter buttons
-starty = 400 # y pos of letter butts uwu
-A = 65 # char representation of a = 65 for loop adds 1 each time presenting next letter in alphabet
-for i in range(26):
-    x = startx + SPACE * 2 + ((RADIUS * 2 + SPACE) * (i % 13)) # distance between each buttons drawn and from the end of the screen.
-    y = starty + ((i // 13) * (SPACE + RADIUS * 2))
-    letters.append([x,y, chr(A + 1)])  # adds pairs and letters represented by num to letters list to draw em on screen
-    # adds 1 to variable A representing next letter, adding that letter to list
-
-#loading images
-images = []
-for i in range(7): # loads each body part/image
-    image = pygame.image.load(path.join(img_dir, ('hangman' + str(i) + '.png'))).convert()
-    images.append(image)
+def start_text():
+    print('\n ====== HANG MAN! ====== ')
+    t.sleep(1.5)
     
-def draw():
-    screen.fill(WHITE)
+def guessing(word_chosen): 
+    word = word_chosen
+    turns = 10
+    guesses = "" # empty string used to check if the letters added to this string is in the word chosen
     
-    for letter in letters: # draws buttons
-        x, y, ltr = letter # splits pairs: x,y,letter
-        pygame.draw.circle(screen, BLACK, (x,y), RADIUS, 3) # draws black circle with thickness = 3
-        text = font_name.render(ltr, 1, BLACK)
-        screen.blit(text, (x - text.get_width() / 2, y - text.get_height() / 2)) # draws letters at center / starting at topleft of circle
+    # prints lines
+    while turns > 0:
+        letters_left = 0 # Everytime it loops it resets to 0 but adds 1 if you have a letter missing. If all letters there, you win
+        for char in word: # prints line for 
+            if char in guesses: # if the characters of the chosen word is in the guesses string, print every character
+                print(char)
+            else: # for every character in chosen word that is not in the guesses string, print a line
+                print('_')
+                letters_left += 1
+                
+        if letters_left == 0:
+            print('You guessed it!') # potato dies and leaves this func if all letters found
+            break
         
-    screen.blit(images[man_part], (150,100))
-    pygame.display.update()
-    
-# ========================================= #
-#                   Main
-# ========================================= #
-
-man_part = 0 # what body part to draw
+        print('\nGuess a character or the word: ') # if still has letters, guess another letter
+        guess = input('> ')
+        post_guess = guess.strip()# removes spaces before and after input / prevent spaces bef and aft
+        guesses += post_guess.lower() # adds string to empty string (guesses) in lower case
+        
+        if post_guess.lower() not in word: # if string input not in word, -1 turns
+            turns -= 1
+            print("Wrong")
+            print('\nYou have', + turns, 'more guesses')
+        
+        if turns == 0: # no more turns u die
+            print('You Lose')
+            
+            
+def end_text():
+    t.sleep(1.5)
+    print(' ============= End ============= ')
+    t.sleep(1)
+            
+# ================================== #
+#                Main
+# ================================== #
 
 running = True
-# ============ Game Loop ============ #
-while running: 
-    clock.tick(FPS)
+while running:
+    start_text()
+    added_words.clear()
+    print('Would you like to enter your own words? y/n?')
+    choose_words = input('> ')
     
-    draw()
-    
-    for event in pygame.event.get(): # keeps track of events
-        if event.type == pygame.QUIT:
-            running = False
+    if 'y' in choose_words.lower() or 'sure' in choose_words.lower(): # if they choose their own words
+        done_choosing = False
+        while not done_choosing: # choosing sequence
+            print('\nONE word you would like to add:')
+            add_word = input('> ')
+            added_word = add_word.strip() # removes spaces before and after input / prevent spaces bef and aft
+            added_words.append(added_word.lower()) # adds word in lower case
+            print('Word added')
             
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            pos = pygame.mouse.get_pos() # keeps track of mouse position on click. 
-            print(pos)
-              
-pygame.quit()
+            understanding = False
+            while not understanding: # my fix to prevent people spamming their words and accidentally choosing an undesired option.
+                print('\nWould you like to add another word? yes or no?')
+                still_choosing = input('> ')
+                if 'ye' in still_choosing.lower() or 'sure' in still_choosing.lower():
+                    done_choosing = False
+                    understanding = True
+                    
+                elif 'no' in still_choosing.lower() or 'na' in still_choosing.lower():
+                    done_choosing = True
+                    understanding = True
+                
+                else:
+                    print("I don't understand")
+                    understanding = False
         
+        num_of_words = len(added_words) # cycles thru own words list till you get everything
+        while num_of_words > 0:
+            chosen_word = r.choice(added_words)# chooses word from list
+            added_words.remove(chosen_word) # then removes it from list
+            print('\nWord:')
+            guessing(chosen_word)
+            num_of_words -= 1
+        
+        end_text()
+        
+    elif 'n' in choose_words.lower():
+        num_of_words = len(standard_words)
+        while num_of_words > 0:
+            chosen_word = r.choice(standard_words) # cycles thru standard words list if choose not to add words.
+            standard_words.remove(chosen_word) # then removes it from list
+            print('\nWord:')
+            guessing(chosen_word)
+            num_of_words -= 1
+        
+        end_text()
+        
+    else:
+        print("\nI don't understand.")
+            
