@@ -45,8 +45,7 @@ def guessing(word_chosen):
         
         if turns == 0: # no more turns u die
             print('You Lose')
-            
-            
+                       
 def end_text():
     t.sleep(1.5)
     print(' ============= End ============= ')
@@ -59,7 +58,7 @@ def end_text():
 running = True
 while running:
     start_text()
-    added_words.clear()
+    added_words.clear() # clears added list each playthru
     print('Would you like to enter your own words? y/n?')
     choose_words = input('> ')
     
@@ -99,9 +98,9 @@ while running:
         end_text()
         
     elif 'n' in choose_words.lower():
-        num_of_words = len(standard_words)
+        num_of_words = len(standard_words) # cycles thru standard words list if choose not to add words.
         while num_of_words > 0:
-            chosen_word = r.choice(standard_words) # cycles thru standard words list if choose not to add words.
+            chosen_word = r.choice(standard_words) # chooses random word
             standard_words.remove(chosen_word) # then removes it from list
             print('\nWord:')
             guessing(chosen_word)
