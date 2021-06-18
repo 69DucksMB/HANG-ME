@@ -1,0 +1,83 @@
+# ================================= #
+# HANGME.py
+# 6/17/2021
+# Mark Balagtas
+# I just made this today cuz I restarted like 15 billion times on this assignment cuz I don't know what to make. ( ͡° ͜ʖ ͡°)
+# ================================= #
+
+# ============= imports ============== #
+import pygame
+import math
+import random
+from os import path 
+
+img_dir = path.join(path.dirname(__file__), 'img') # img directory uwu
+
+WIDTH = 800 # screen
+HEIGHT = 600
+FPS = 60
+
+WHITE = (255,255,255) # COLOURS
+BLACK = (0,0,0)
+
+pygame.init() # inits pygame 
+screen = pygame.display.set_mode((WIDTH, HEIGHT)) # open game window using da width and height
+pygame.display.set_caption("HANG MEEEEEEEE!!!!!!")
+clock = pygame.time.Clock() # for fps
+
+font_name = pygame.font.SysFont('comicsans', 40)
+
+#button vars
+RADIUS = 20
+SPACE = 15
+letters = []
+startx = round((WIDTH - (RADIUS * 2 + SPACE) * 13) / 2) # x position of letter buttons
+starty = 400 # y pos of letter butts uwu
+A = 65 # char representation of a = 65 for loop adds 1 each time presenting next letter in alphabet
+for i in range(26):
+    x = startx + SPACE * 2 + ((RADIUS * 2 + SPACE) * (i % 13)) # distance between each buttons drawn and from the end of the screen.
+    y = starty + ((i // 13) * (SPACE + RADIUS * 2))
+    letters.append([x,y, chr(A + 1)])  # adds pairs and letters represented by num to letters list to draw em on screen
+    # adds 1 to variable A representing next letter, adding that letter to list
+
+#loading images
+images = []
+for i in range(7): # loads each body part/image
+    image = pygame.image.load(path.join(img_dir, ('hangman' + str(i) + '.png'))).convert()
+    images.append(image)
+    
+def draw():
+    screen.fill(WHITE)
+    
+    for letter in letters: # draws buttons
+        x, y, ltr = letter # splits pairs: x,y,letter
+        pygame.draw.circle(screen, BLACK, (x,y), RADIUS, 3) # draws black circle with thickness = 3
+        text = font_name.render(ltr, 1, BLACK)
+        screen.blit(text, (x - text.get_width() / 2, y - text.get_height() / 2)) # draws letters at center / starting at topleft of circle
+        
+    screen.blit(images[man_part], (150,100))
+    pygame.display.update()
+    
+# ========================================= #
+#                   Main
+# ========================================= #
+
+man_part = 0 # what body part to draw
+
+running = True
+# ============ Game Loop ============ #
+while running: 
+    clock.tick(FPS)
+    
+    draw()
+    
+    for event in pygame.event.get(): # keeps track of events
+        if event.type == pygame.QUIT:
+            running = False
+            
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            pos = pygame.mouse.get_pos() # keeps track of mouse position on click. 
+            print(pos)
+              
+pygame.quit()
+        
